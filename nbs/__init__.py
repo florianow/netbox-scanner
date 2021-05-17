@@ -45,12 +45,17 @@ class NetBoxScanner(object):
             logging.error(f'duplicated: {host[0]}/32')
             self.stats['errors'] += 1
             return False
+        try: 
+            hostindex=host[2] 
+        except IndexError: 
+            hostindex=host[1]
 
         if nbhost:
             if (self.tag in nbhost.tags):
                 if (host[1] != nbhost.description):
                     aux = nbhost.description
-                    nbhost.description = host[1]
+                    nbhost.description = hostindex
+                    nbhost.dns_name=host[1]
                     nbhost.save()
                     logging.info(
                         f'updated: {host[0]}/32 "{aux}" -> "{host[1]}"')
@@ -62,11 +67,12 @@ class NetBoxScanner(object):
                 logging.info(f'unchanged: {host[0]}/32 "{host[1]}"')
                 self.stats['unchanged'] += 1
         else:
+            
             self.netbox.ipam.ip_addresses.create(
                 address=host[0],
                 tags=[{"name": self.tag}],
-                # dns_name=host[1],
-                description=host[1]
+                dns_name=host[1],
+                description=hostindex
             )
             logging.info(f'created: {host[0]}/32 "{host[1]}"')
             self.stats['created'] += 1
