@@ -21,7 +21,8 @@ class Nmap(object):
                 try:
                     self.hosts.append((
                         host.find('address').attrib['addr'],
-                        host.find('hostnames').find('hostname').attrib['name']
+                        host.find('hostnames').find('hostname').attrib['name'],
+                        self.unknown
                     ))
                 except AttributeError:
                     self.hosts.append((
